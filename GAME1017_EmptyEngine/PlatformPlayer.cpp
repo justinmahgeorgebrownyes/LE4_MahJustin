@@ -4,7 +4,7 @@
 #include <cmath>
 #include "States.h"
 
-PlatformPlayer::PlatformPlayer(SDL_Rect s, SDL_FRect d) : AnimatedSpriteObject(s, d),
+PlatformPlayer::PlatformPlayer(SDL_Rect s, SDL_FRect d, const int w, const int h) : AnimatedSpriteObject(s, d),
 
 	m_state(STATE_JUMPING), m_isGrounded(false), m_isFacingLeft(false),
 		m_maxVelX(9.0), m_maxVelY(JUMPFORCE), m_grav(GRAVITY), m_drag(0.85) 
@@ -12,6 +12,26 @@ PlatformPlayer::PlatformPlayer(SDL_Rect s, SDL_FRect d) : AnimatedSpriteObject(s
 
 {
 		m_accelX = m_accelY = m_velX = m_velY = 0.0;
+
+		char key;
+		m_playerkey = 'a';
+		for (int y = 0; y < 2; y++)
+		{
+			for (int x = 0; x < 9; x++) {
+
+				key = (char)'a' + x + (9 * y);
+
+
+				m_tiles.emplace(key, new Tile({ x * w, y * h, w, h },
+					{ 0.0f, 0.0f, (float)64, (float)64 }, 0, 0));
+			}
+		} 
+
+
+
+		
+		
+
 	}
 
 
@@ -20,7 +40,12 @@ void PlatformPlayer::Update()
 	switch (m_state) { //inside each case is the behaving in and transiton from that state
 	case STATE_IDLING:
 		//transitoin to run
+
+
 		if (EVMA::KeyPressed(SDL_SCANCODE_A) || EVMA::KeyPressed(SDL_SCANCODE_D)) {
+
+
+
 			m_state = STATE_RUNNING;
 			//SetAnimation(?,?,?,?);
 			SetAnimation(288, 480, 64, 64);
@@ -38,6 +63,8 @@ void PlatformPlayer::Update()
 
 		break;
 	case STATE_RUNNING:
+
+
 
 		//move on ground
 		if (EVMA::KeyHeld(SDL_SCANCODE_A)) {
@@ -75,6 +102,8 @@ void PlatformPlayer::Update()
 
 		break;
 	case STATE_JUMPING:
+
+
 
 		if (EVMA::KeyHeld(SDL_SCANCODE_A)){
 
@@ -116,7 +145,7 @@ void PlatformPlayer::Update()
 	m_dst.y += (float)m_velY;
 
 	m_accelX = m_accelY = 0.0;
-	//animate();
+	Animate();
 }
 
 void PlatformPlayer::Render()
@@ -125,7 +154,6 @@ void PlatformPlayer::Render()
 
 //	SDL_RenderCopyExF(Engine::Instance().GetRenderer(), TEMA::GetTexture("player"), &m_src, &m_dst, m_sprite, nullptr, SDL_FLIP_NONE);
 
-	SDL_RenderCopyF(Engine::Instance().GetRenderer(), TEMA::GetTexture("player"), &m_src, &m_dst);
 
 	
 
@@ -136,9 +164,14 @@ void PlatformPlayer::Render()
 
 
 	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 255, 0, 0, 255);
-	SDL_RenderFillRectF(Engine::Instance().GetRenderer(), &m_dst);
+//	SDL_RenderFillRectF(Engine::Instance().GetRenderer(), &m_dst);
 
-	
+	Tile* temp = m_tiles[m_playerkey]->Clone();
+
+	temp->SetXY(m_dst.x, m_dst.y);
+
+	SDL_RenderCopyExF(Engine::Instance().GetRenderer(), TEMA::GetTexture("player"), temp->GetSrc(), temp->GetDst(), 0, nullptr, SDL_FLIP_NONE);
+
 }
 
 void PlatformPlayer::Stop()

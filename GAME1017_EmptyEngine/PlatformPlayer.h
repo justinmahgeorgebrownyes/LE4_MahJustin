@@ -7,6 +7,8 @@
 #define GRAVITY 2.0
 #define JUMPFORCE 25.0
 
+#include "TiledLevel.h"
+
 enum PlayerState { STATE_IDLING, STATE_RUNNING, STATE_JUMPING};
 
 
@@ -15,7 +17,7 @@ enum PlayerState { STATE_IDLING, STATE_RUNNING, STATE_JUMPING};
 class PlatformPlayer : public AnimatedSpriteObject {
 	
 public:
-PlatformPlayer(SDL_Rect s, SDL_FRect d);
+PlatformPlayer(SDL_Rect s, SDL_FRect d, const int w, const int h);
 	void Update();
 	void Render();
 	
@@ -40,7 +42,8 @@ private:
 		m_maxVelX, m_maxVelY,
 		m_drag, m_grav;
 	PlayerState m_state;
-
+	map<char, Tile*> m_tiles;
+	char m_playerkey;
 
 
 };
