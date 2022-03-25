@@ -41,6 +41,9 @@ void PlatformPlayer::Update()
 	case STATE_IDLING:
 		//transitoin to run
 
+		m_playerkey = (char)'a' + 9 + (0 % 4);
+
+
 
 		if (EVMA::KeyPressed(SDL_SCANCODE_A) || EVMA::KeyPressed(SDL_SCANCODE_D)) {
 
@@ -64,6 +67,7 @@ void PlatformPlayer::Update()
 		break;
 	case STATE_RUNNING:
 
+		m_playerkey = (char)'a' + 0 + (m_frame % 8);
 
 
 		//move on ground
@@ -104,6 +108,7 @@ void PlatformPlayer::Update()
 	case STATE_JUMPING:
 
 
+		m_playerkey = (char)'a' + 17;
 
 		if (EVMA::KeyHeld(SDL_SCANCODE_A)){
 
