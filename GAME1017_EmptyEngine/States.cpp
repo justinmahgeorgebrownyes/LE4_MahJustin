@@ -8,7 +8,7 @@
 #include "Primitives.h"
 #include "Button3.h"
 #include "PlatformPlayer.h"
-
+#include "GameObject.h"
 #include <iostream>
 using namespace std;
 
@@ -91,10 +91,15 @@ void GameState::Enter() // Used for initialization.
 {
 	
 	TEMA::Load("Img/Tiles.png", "tiles");
+
 	//loda player image and give it a string key of "player"..
+
+	TEMA::Load("Img/Player.png", "player");
+
+
 	m_objects.push_back(pair<string, GameObject*>("level", new TiledLevel(
 		24, 32, 32, 32, "Dat/Tiledata.txt", "Dat/Level1.txt", "tiles")));
-	m_objects.push_back(pair<string, GameObject*>("player", new PlatformPlayer({ 0,0,0,0 }, {288, 240, 64, 64})));
+	m_objects.push_back(pair<string, GameObject*>("player", new PlatformPlayer({ 0,0,0,0 }, {288, 480, 64, 64})));
 
 
 }
@@ -111,6 +116,42 @@ void GameState::Update()
 		i.second->Update();
 		if (STMA::StateChanging()) return;
 	}
+	//check collision
+	PlatformPlayer* pObj = static_cast<PlatformPlayer*>(GetGo("player"));
+	SDL_FRect* pBound = pObj->GetDst();
+	TiledLevel* pLevel = static_cast<TiledLevel*>(GetGo("level"));
+
+	for (unsigned int i = 0; i < pLevel->GetObstacles().size(); i++) {
+		SDL_FRect* pTile = pLevel->GetObstacles()[i]->GetDst();
+		if (COMA::AABBCheck(*pBound, *pTile)) {
+
+			bool colTop = false;
+
+			//top side
+			if ((pBound->y + pBound->h) - (float)pObj->GetVelY() <= pTile->y) {
+				colTop = true;
+				pObj->StopY();
+				pObj->SetY(pTile->y - pBound->h);
+				pObj->SetGrounded(true);
+			}
+			//	if colliding with bottom side of tile
+			else if (pBound->y - (float)pObj->GetVelY() >= (pTile->y + pTile->h)) {
+				pObj->StopY();
+				pObj->SetY(pTile->y + pTile->h);
+			}
+			//left side
+			if ((pBound->x +pBound -> w)- (float)pObj->GetVelX() <= pTile->x) {
+				pObj->StopX();
+				pObj->SetX(pTile->x - pTile->w);
+			}
+			//right side
+			else if (pBound->x - (float)pObj->GetVelX() >= (pTile->x + pTile->w)) {
+				pObj->StopX();
+				pObj->SetX(pTile->x + pTile->w);
+			}
+		}
+	}
+
 }
 
 void GameState::Render()

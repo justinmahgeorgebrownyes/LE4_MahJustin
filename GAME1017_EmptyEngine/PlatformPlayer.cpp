@@ -2,6 +2,7 @@
 #include "EventManager.h"
 #include "TextureManager.h"
 #include <cmath>
+#include "States.h"
 
 PlatformPlayer::PlatformPlayer(SDL_Rect s, SDL_FRect d) : AnimatedSpriteObject(s, d),
 
@@ -22,6 +23,7 @@ void PlatformPlayer::Update()
 		if (EVMA::KeyPressed(SDL_SCANCODE_A) || EVMA::KeyPressed(SDL_SCANCODE_D)) {
 			m_state = STATE_RUNNING;
 			//SetAnimation(?,?,?,?);
+			SetAnimation(288, 480, 64, 64);
 		}
 		//transition to jump
 		else if ( EVMA::KeyPressed(SDL_SCANCODE_SPACE) && m_isGrounded) {
@@ -30,7 +32,7 @@ void PlatformPlayer::Update()
 			m_isGrounded = false;
 			m_state = STATE_JUMPING;
 			//set animation (?,?,?,?);
-
+			SetAnimation(288, 480, 64, 64);
 		}
 
 
@@ -67,7 +69,7 @@ void PlatformPlayer::Update()
 			m_isGrounded = false;
 			m_state = STATE_JUMPING;
 			//set animation (?,?,?,?);
-
+			SetAnimation(288, 480, 64, 64);
 		}
 
 
@@ -93,6 +95,8 @@ void PlatformPlayer::Update()
 
 
 			//setanimation(?,?,?,?);
+			SetAnimation(288, 480, 64, 64);
+
 
 
 		}
@@ -118,13 +122,23 @@ void PlatformPlayer::Update()
 void PlatformPlayer::Render()
 {
 	//to animate the sprite, use sdl_rendercopyexf() and you wll ahve to access the texture manager and pass in a key such as "player".
+
+//	SDL_RenderCopyExF(Engine::Instance().GetRenderer(), TEMA::GetTexture("player"), &m_src, &m_dst, m_sprite, nullptr, SDL_FLIP_NONE);
+
+	SDL_RenderCopyF(Engine::Instance().GetRenderer(), TEMA::GetTexture("player"), &m_src, &m_dst);
+
+	
+
+	// 
+	// 
+	// 
 	//but for this part, w'erd going to use a colored square
 
 
 	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 255, 0, 0, 255);
 	SDL_RenderFillRectF(Engine::Instance().GetRenderer(), &m_dst);
 
-
+	
 }
 
 void PlatformPlayer::Stop()
